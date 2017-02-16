@@ -1,16 +1,16 @@
 #FROM ubuntu
 #RUN apt-get update
 #RUN apt-get install -y git nodejs npm nodejs-legacy
-#RUN git clone git://github.com/DuoSoftware/DVP-Engagement.git /usr/local/src/engagementservice
-#RUN cd /usr/local/src/engagementservice; npm install
-#CMD ["nodejs", "/usr/local/src/engagementservice/app.js"]
+#RUN git clone https://github.com/DuoSoftware/DVP-Contacts.git /usr/local/src/contacts
+#RUN cd /usr/local/src/contacts; npm install
+#CMD ["nodejs", "/usr/local/src/contacts/app.js"]
 
-#EXPOSE 8834
+#EXPOSE 8893
 
 FROM node:argon
-RUN git clone git://github.com/DuoSoftware/DVP-Engagement.git /usr/local/src/engagementservice
-RUN cd /usr/local/src/engagementservice;
-WORKDIR /usr/local/src/engagementservice
+RUN git clone https://github.com/DuoSoftware/DVP-Contacts.git /usr/local/src/contacts
+RUN cd /usr/local/src/contacts;
+WORKDIR /usr/local/src/contacts
 RUN npm install
-EXPOSE 8834
-CMD [ "node", "/usr/local/src/engagementservice/app.js" ]
+EXPOSE 8893
+CMD [ "node", "/usr/local/src/contacts/app.js" ]

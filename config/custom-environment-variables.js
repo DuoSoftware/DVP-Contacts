@@ -10,9 +10,9 @@ module.exports = {
     "Host":
     {
         "domain": "HOST_NAME",
-        "port": "HOST_ENGAGEMENTSERVICE_PORT",
+        "port": "HOST_CONTACTS_PORT",
         "version": "HOST_VERSION",
-        "hostpath":"HOST_PATH",
+        "hostpath":"NODE_CONFIG_DIR",
         "logfilepath": "LOG4JS_CONFIG"
     }
 ,"Security":
