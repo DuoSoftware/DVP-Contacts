@@ -24,7 +24,7 @@ module.exports = {
     "Host": {
         "domain": "0.0.0.0",
         "port": 8827,
-        "version": "6.0",
+        "version": "1.0.0.0",
         "hostpath": "./config",
         "logfilepath": ""
     },
@@ -32,7 +32,7 @@ module.exports = {
     {
         "ip":"45.55.142.207",
         "port":"27017",
-        "dbname":"dvp-engagements",
+        "dbname":"dvpdb",
         "user":"duo",
         "password":"DuoS123"
     }
