@@ -8,29 +8,35 @@ var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var moment = require("moment");
 var async = require("async");
-
-var MongoClient = require('mongodb').MongoClient
-    , assert = require('assert'),
-    ObjectID = require('mongodb').ObjectID;
-
-/*
- // Connection URL
- var url = 'mongodb://dave:password@localhost:27017?authMechanism=DEFAULT&authSource=db';
- */
+var util = require('util');
+var Contact = require('./contact').Contact;
 
 
-// Connection URL
-var url = 'mongodb://' + config.Mongo.user + ':' + config.Mongo.password + '@' + config.Mongo.ip + ':' + config.Mongo.port + '/' + config.Mongo.dbname; //'mongodb://localhost:27017/dvp-engagements';
+var mongoip = config.Mongo.ip;
+var mongoport = config.Mongo.port;
+var mongodb = config.Mongo.dbname;
+var mongouser = config.Mongo.user;
+var mongopass = config.Mongo.password;
 
-var database;
-var baseDb;
-MongoClient.connect(url, function (err, db) {
-    assert.equal(null, err);
-    console.log("Connected correctly to server");
-    database = db.collection("Engagements");
-    baseDb = db;
+
+var mongoose = require('mongoose');
+var connectionstring = util.format('mongodb://%s:%s@%s:%d/%s', mongouser, mongopass, mongoip, mongoport, mongodb)
+
+
+mongoose.connection.on('error', function (err) {
+    throw new Error(err);
 });
 
+mongoose.connection.on('disconnected', function () {
+    throw new Error('Could not connect to database');
+});
+
+mongoose.connection.once('open', function () {
+    console.log("Connected to db");
+});
+
+
+mongoose.connect(connectionstring);
 /*
  baseDb.authenticate(config.Mongo.user, config.Mongo.password, function(err, success){
  if(success){
@@ -59,115 +65,108 @@ var resetConnection = function () {
 
 exports.saveContact = function (tenant, company, req, res) {
 
-    res.setHeader('Content-Type', 'application/json');
 
-    var schm = tenant + "-" + company;
-    var collection = baseDb.collection(schm.toString());
-    var now = moment(new Date());
-    collection.insertOne({
-        _id: req.body.ContactId.toString(),
-        contactDetails: req.body.contactDetails
-    }, function (err, result) {
-        var jsonString = "";
-        if (err) {
-            logger.error('saveContact - [%s]', req.body.ContactId, err);
-            jsonString = messageFormatter.FormatMessage(err, "EXCEPTION", false, undefined);
-            res.end(jsonString);
+    var jsonString = "";
+    var contactObject = Contact({
+        company: company,
+        tenant: tenant,
+        contact: req.body.contact,
+        type: req.body.type,
+        name: req.body.name
+    });
+
+    contactObject.save(function (errSave, resSave) {
+        if (errSave) {
+            jsonString = messageFormatter.FormatMessage(errSave, "Contact saving failed", false, undefined);
+
         }
         else {
-            logger.info('saveContact - [%s]', result);
-            jsonString = messageFormatter.FormatMessage(undefined, "saveContact", result.result.ok == 1, result.insertedId.toString());
-            res.end(jsonString);
+            jsonString = messageFormatter.FormatMessage(undefined, "Contact saving succeed", true, resSave);
+
         }
+        res.end(jsonString);
     });
+
 
 };
 
 exports.updateContact = function (tenant, company, req, res) {
 
-    res.setHeader('Content-Type', 'application/json');
-
     var jsonString;
-    var schm = tenant + "-" + company;
-    var collection = baseDb.collection(schm.toString());
-    collection.update({'_id':req.params.ContactId},{$set:{'contactDetails':req.body.contactDetails}}, function (err, result) {
-        if (!err) {
-            logger.info('updateContact - [%s]', req.params.ContactId);
-            jsonString = messageFormatter.FormatMessage(undefined, "EXCEPTION", result.result.ok == 1, insertedId);
-            res.end(jsonString);
+
+    Contact.findOneAndUpdate({
+        _id: req.params.ContactId,
+        company: company,
+        tenant: tenant
+    }, req.body, function (errSave, resSave) {
+        if (errSave) {
+            jsonString = messageFormatter.FormatMessage(errSave, "Contact update failed", false, undefined);
+
         }
         else {
+            jsonString = messageFormatter.FormatMessage(undefined, "Contact update succeed", true, resSave);
 
-            logger.error('updateContact - [%s]', req.params.ContactId, err);
-            jsonString = messageFormatter.FormatMessage(err, "EXCEPTION", false, undefined);
-            res.end(jsonString);
         }
-    })
+        res.end(jsonString);
+    });
+
+
 };
 
 exports.getContactById = function (tenant, company, req, res) {
 
-    res.setHeader('Content-Type', 'application/json');
 
     var jsonString;
-    var schm = tenant + "-" + company;
-    var collection = baseDb.collection(schm.toString());
-    collection.findOne({'_id':req.params.ContactId}, function (err, result) {
-        if (!err) {
-            logger.info('getContactById - [%s]', req.params.ContactId);
-            jsonString = messageFormatter.FormatMessage(undefined, "EXCEPTION", result.result.ok == 1, insertedId);
-            res.end(jsonString);
+
+    Contact.findOne({_id: req.params.ContactId, company: company, tenant: tenant}, function (errSave, resSave) {
+        if (errSave) {
+            jsonString = messageFormatter.FormatMessage(errSave, "Contact get failed", false, undefined);
+
         }
         else {
+            jsonString = messageFormatter.FormatMessage(undefined, "Contact get succeed", true, resSave);
 
-            logger.error('getContactById - [%s]', req.params.ContactId, err);
-            jsonString = messageFormatter.FormatMessage(err, "EXCEPTION", false, undefined);
-            res.end(jsonString);
         }
-    })
+        res.end(jsonString);
+    });
 };
 
 exports.getContacts = function (tenant, company, req, res) {
 
-    res.setHeader('Content-Type', 'application/json');
-
     var jsonString;
-    var schm = tenant + "-" + company;
-    var collection = baseDb.collection(schm.toString());
-    collection.find({'_id':req.params.ContactId}, function (err, result) {
-        if (!err) {
-            logger.info('getContacts - [%s]', req.params.ContactId);
-            jsonString = messageFormatter.FormatMessage(undefined, "EXCEPTION", result.result.ok == 1, insertedId);
-            res.end(jsonString);
+
+    Contact.find({company: company, tenant: tenant}, function (errSave, resSave) {
+        if (errSave) {
+            jsonString = messageFormatter.FormatMessage(errSave, "Contacts get failed", false, undefined);
+
         }
         else {
+            jsonString = messageFormatter.FormatMessage(undefined, "Contacts get succeed", true, resSave);
 
-            logger.error('getContacts - [%s]', req.params.ContactId, err);
-            jsonString = messageFormatter.FormatMessage(err, "EXCEPTION", false, undefined);
-            res.end(jsonString);
         }
-    })
+        res.end(jsonString);
+    });
 };
 
 exports.deleteContact = function (tenant, company, req, res) {
 
-    res.setHeader('Content-Type', 'application/json');
-
     var jsonString;
-    var schm = tenant + "-" + company;
-    var collection = baseDb.collection(schm.toString());
-    collection.deleteOne({'_id':req.params.ContactId}, function (err, result) {
-        if (!err) {
-            logger.info('deleteContact - [%s]', req.params.ContactId);
-            jsonString = messageFormatter.FormatMessage(undefined, "EXCEPTION", result.result.ok == 1, insertedId);
-            res.end(jsonString);
+
+    Contact.findOneAndRemove({
+        _id: req.params.ContactId,
+        company: company,
+        tenant: tenant
+    }, function (errSave, resSave) {
+        if (errSave) {
+            jsonString = messageFormatter.FormatMessage(errSave, "Contact remove failed", false, undefined);
+
         }
         else {
+            jsonString = messageFormatter.FormatMessage(undefined, "Contact remove succeed", true, resSave);
 
-            logger.error('deleteContact - [%s]', req.params.ContactId, err);
-            jsonString = messageFormatter.FormatMessage(err, "EXCEPTION", false, undefined);
-            res.end(jsonString);
         }
-    })
+        res.end(jsonString);
+    });
+
 };
 
