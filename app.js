@@ -27,6 +27,7 @@ RestServer.use(restify.fullResponse());
 
 //Server listen
 RestServer.listen(port, function () {
+    
     console.log('%s listening at %s', RestServer.name, RestServer.url);
 });
 
