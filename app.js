@@ -52,6 +52,8 @@ RestServer.post('/DVP/API/' + version + '/ContactManager/Contact', authorization
 }), function (req, res, next) {
     try {
 
+        
+
         logger.info('[saveContact] - [HTTP]  - Request received -  Data - %s ', JSON.stringify(req.body));
 
         if (!req.user ||!req.user.tenant || !req.user.company)
