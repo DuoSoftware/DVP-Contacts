@@ -3,7 +3,6 @@
  */
 
 var restify = require('restify');
-var cors = require('cors');
 var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 
 var config = require('config');
@@ -24,6 +23,9 @@ var RestServer = restify.createServer({
 restify.CORS.ALLOW_HEADERS.push('authorization');
 RestServer.use(restify.CORS());
 RestServer.use(restify.fullResponse());
+RestServer.use(restify.acceptParser(RestServer.acceptable));
+RestServer.use(restify.queryParser());
+RestServer.use(restify.bodyParser());
 
 //Server listen
 RestServer.listen(port, function () {
@@ -31,11 +33,7 @@ RestServer.listen(port, function () {
     console.log('%s listening at %s', RestServer.name, RestServer.url);
 });
 
-//Enable request body parsing(access)
-RestServer.use(restify.bodyParser());
-RestServer.use(restify.acceptParser(RestServer.acceptable));
-RestServer.use(restify.queryParser());
-RestServer.use(cors());
+
 
 // ---------------- Security -------------------------- \\
 var jwt = require('restify-jwt');
@@ -54,6 +52,8 @@ RestServer.post('/DVP/API/' + version + '/ContactManager/Contact', authorization
     action: "write"
 }), function (req, res, next) {
     try {
+
+        
 
         logger.info('[saveContact] - [HTTP]  - Request received -  Data - %s ', JSON.stringify(req.body));
 
