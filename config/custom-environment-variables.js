@@ -29,7 +29,8 @@ module.exports = {
         "port":"SYS_MONGO_PORT",
         "dbname":"SYS_MONGO_DB",
         "user":"SYS_MONGO_USER",
-        "password":"SYS_MONGO_PASSWORD"
+        "password":"SYS_MONGO_PASSWORD",
+        "replicaset" :"SYS_MONGO_REPLICASETNAME"
     }
 };
 
