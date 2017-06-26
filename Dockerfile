@@ -8,7 +8,8 @@
 #EXPOSE 8893
 
 FROM node:argon
-RUN git clone https://github.com/DuoSoftware/DVP-Contacts.git /usr/local/src/contacts
+ARG VERSION_TAG
+RUN git clone -b $VERSION_TAG https://github.com/DuoSoftware/DVP-Contacts.git /usr/local/src/contacts
 RUN cd /usr/local/src/contacts;
 WORKDIR /usr/local/src/contacts
 RUN npm install
