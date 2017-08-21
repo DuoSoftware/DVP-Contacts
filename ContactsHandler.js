@@ -9,9 +9,85 @@ var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJ
 var moment = require("moment");
 var async = require("async");
 var util = require('util');
-/*var Contact = require('./contact').Contact;*/
-var Contact = require('dvp-mongomodels/model/Contact');
+var Contact = require('./contact').Contact;
 
+
+var mongoip = config.Mongo.ip;
+var mongoport = config.Mongo.port;
+var mongodb = config.Mongo.dbname;
+var mongouser = config.Mongo.user;
+var mongopass = config.Mongo.password;
+var mongoreplicaset= config.Mongo.replicaset;
+
+
+var mongoose = require('mongoose');
+var connectionstring = '';
+mongoip = mongoip.split(',');
+if(util.isArray(mongoip)){
+ if(mongoip.length > 1){ 
+    mongoip.forEach(function(item){
+        connectionstring += util.format('%s:%d,',item,mongoport)
+    });
+
+    connectionstring = connectionstring.substring(0, connectionstring.length - 1);
+    connectionstring = util.format('mongodb://%s:%s@%s/%s',mongouser,mongopass,connectionstring,mongodb);
+
+    if(mongoreplicaset){
+        connectionstring = util.format('%s?replicaSet=%s',connectionstring,mongoreplicaset) ;
+        console.log("connectionstring ...   "+connectionstring);
+    }
+ }
+    else
+    {
+        connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip[0],mongoport,mongodb);
+    }
+}else{
+
+    connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip,mongoport,mongodb);
+   
+}
+
+ console.log("connectionstring ...   "+connectionstring);
+
+mongoose.connection.on('error', function (err) {
+    console.error( new Error(err));
+});
+
+mongoose.connection.on('disconnected', function() {
+    console.error( new Error('Could not connect to database'));
+});
+
+mongoose.connection.once('open', function() {
+    console.log("Connected to db");
+});
+
+
+mongoose.connect(connectionstring);
+/*
+ baseDb.authenticate(config.Mongo.user, config.Mongo.password, function(err, success){
+ if(success){
+ callback(null, db);
+ }
+ else {
+ callback(err ? err : new Error('Could not authenticate user ' + user), null);
+ }
+ });
+
+ */
+
+var resetConnection = function () {
+    try {
+        MongoClient.connect(url, function (err, db) {
+            assert.equal(null, err);
+            console.log("Reset Connection.....");
+            database = db;
+        });
+    }
+    catch (ex) {
+        var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
+        logger.error('[resetConnection] -  : %s ', jsonString);
+    }
+};
 
 exports.saveContact = function (tenant, company, req, res) {
 

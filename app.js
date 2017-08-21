@@ -11,9 +11,8 @@ var port = config.Host.port || 3000;
 var version = config.Host.version;
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var contactHandler = require('./ContactsHandler');
-var callLogsHandler = require('./CallLogsHandler');
 
-var util = require('util');
+
 
 //-------------------------  Restify Server ------------------------- \\
 var RestServer = restify.createServer({
@@ -45,85 +44,6 @@ RestServer.use(jwt({secret: secret.Secret}));
 
 
 //-------------------------  Restify Server ------------------------- \\
-
-
-var mongoip = config.Mongo.ip;
-var mongoport = config.Mongo.port;
-var mongodb = config.Mongo.dbname;
-var mongouser = config.Mongo.user;
-var mongopass = config.Mongo.password;
-var mongoreplicaset= config.Mongo.replicaset;
-
-
-var mongoose = require('mongoose');
-var connectionstring = '';
-mongoip = mongoip.split(',');
-if(util.isArray(mongoip)){
-    if(mongoip.length > 1){
-        mongoip.forEach(function(item){
-            connectionstring += util.format('%s:%d,',item,mongoport)
-        });
-
-        connectionstring = connectionstring.substring(0, connectionstring.length - 1);
-        connectionstring = util.format('mongodb://%s:%s@%s/%s',mongouser,mongopass,connectionstring,mongodb);
-
-        if(mongoreplicaset){
-            connectionstring = util.format('%s?replicaSet=%s',connectionstring,mongoreplicaset) ;
-            console.log("connectionstring ...   "+connectionstring);
-        }
-    }
-    else
-    {
-        connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip[0],mongoport,mongodb);
-    }
-}else{
-
-    connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip,mongoport,mongodb);
-
-}
-
-console.log("connectionstring ...   "+connectionstring);
-
-mongoose.connection.on('error', function (err) {
-    console.error( new Error(err));
-});
-
-mongoose.connection.on('disconnected', function() {
-    console.error( new Error('Could not connect to database'));
-});
-
-mongoose.connection.once('open', function() {
-    console.log("Connected to db");
-});
-
-
-mongoose.connect(connectionstring);
-/*
- baseDb.authenticate(config.Mongo.user, config.Mongo.password, function(err, success){
- if(success){
- callback(null, db);
- }
- else {
- callback(err ? err : new Error('Could not authenticate user ' + user), null);
- }
- });
-
- */
-
-var resetConnection = function () {
-    try {
-        MongoClient.connect(url, function (err, db) {
-            assert.equal(null, err);
-            console.log("Reset Connection.....");
-            database = db;
-        });
-    }
-    catch (ex) {
-        var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
-        logger.error('[resetConnection] -  : %s ', jsonString);
-    }
-};
-
 
 //-------------------------  ContactService ------------------------- \\
 
@@ -261,87 +181,3 @@ RestServer.del('/DVP/API/' + version + '/ContactManager/Contact/:ContactId', aut
 
 
 //------------------------- End-ContactService ------------------------- \\
-
-RestServer.post('/DVP/API/' + version + '/ContactManager/CallLog', authorization({
-    resource: "contact",
-    action: "write"
-}), function (req, res, next) {
-    try {
-        logger.info('saveCallLogs  - Request received -  Data - %s ', JSON.stringify(req.body));
-
-
-        callLogsHandler.SaveCallLogs(req,res);
-
-    }
-    catch (ex) {
-
-        logger.error('saveCallLogs - Exception occurred -  Data - %s ', JSON.stringify(req.body), ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
-        logger.debug('saveCallLogs - Request response : %s ', jsonString);
-        res.end(jsonString);
-    }
-    return next();
-});
-
-RestServer.get('/DVP/API/' + version + '/ContactManager/CallLog/:Size/:Page', authorization({
-    resource: "contact",
-    action: "write"
-}), function (req, res, next) {
-    try {
-        logger.info('GetCallLogs  - Request received -  Data - %s ', JSON.stringify(req.body));
-
-
-        callLogsHandler.GetCallLogs(req,res);
-
-    }
-    catch (ex) {
-
-        logger.error('GetCallLogs - Exception occurred -  Data - %s ', JSON.stringify(req.body), ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
-        logger.debug('GetCallLogs - Request response : %s ', jsonString);
-        res.end(jsonString);
-    }
-    return next();
-});
-
-RestServer.get('/DVP/API/' + version + '/ContactManager/CallLog/Count', authorization({
-    resource: "contact",
-    action: "read"
-}), function (req, res, next) {
-    try {
-        logger.info('GetCallLogCount  - Request received -  Data - %s ', JSON.stringify(req.body));
-
-
-        callLogsHandler.GetCallLogCount(req,res);
-
-    }
-    catch (ex) {
-
-        logger.error('GetCallLogCount - Exception occurred -  Data - %s ', JSON.stringify(req.body), ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
-        logger.debug('GetCallLogCount - Request response : %s ', jsonString);
-        res.end(jsonString);
-    }
-    return next();
-});
-
-RestServer.get('/DVP/API/' + version + '/ContactManager/SearchCallLog/:Number', authorization({
-    resource: "contact",
-    action: "read"
-}), function (req, res, next) {
-    try {
-        logger.info('SearchCallLogs  - Request received -  Data - %s ', JSON.stringify(req.body));
-
-
-        callLogsHandler.SearchCallLogs(req,res);
-
-    }
-    catch (ex) {
-
-        logger.error('SearchCallLogs - Exception occurred -  Data - %s ', JSON.stringify(req.body), ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
-        logger.debug('SearchCallLogs - Request response : %s ', jsonString);
-        res.end(jsonString);
-    }
-    return next();
-});
