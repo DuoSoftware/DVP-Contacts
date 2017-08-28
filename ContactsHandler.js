@@ -100,7 +100,7 @@ exports.getContacts = function (tenant, company, req, res) {
 
         }
         res.end(jsonString);
-    });
+    }).select("contact type name category");
 };
 
 exports.deleteContact = function (tenant, company, req, res) {
