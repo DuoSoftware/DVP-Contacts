@@ -109,7 +109,7 @@ module.exports.GetCallLogs = function (req, res) {
     }
     if (iss) {
         CallLogs.find(query).skip(skip)
-            .limit(size).select("-_id data created_at")
+            .limit(size).select("-_id data created_at").sort({created_at: -1})
             .exec(function (err, report) {
                 if (err) {
                     jsonString = messageFormatter.FormatMessage(err, "Fail to find CallLogs", false, null);
