@@ -76,6 +76,9 @@ module.exports.GetCallLogs = function (req, res) {
     var tenant = parseInt(req.user.tenant);
     var company = parseInt(req.user.company);
     var iss = req.user.iss;
+    if (req.params.ResourceName) {
+        iss = req.params.ResourceName;
+    }
 
     var page = parseInt(req.params.Page),
         size = parseInt(req.params.Size),
@@ -84,28 +87,28 @@ module.exports.GetCallLogs = function (req, res) {
     var query = {resourceName: iss, resourceId: iss, company: company, tenant: tenant};
     if (req.params.date) {
 
-        var from= new Date();
-        var to= new Date();
+        var from = new Date();
+        var to = new Date();
 
-        switch(req.params.date.toLowerCase()) {
+        switch (req.params.date.toLowerCase()) {
             case "today":
 
                 /*from.setDate(from.getDate()-1);
-                from.setDate(from.getDate()-1);
-                from.setHours(0,0,0,0);
-                to.setHours(24,0,0,0);*/
+                 from.setDate(from.getDate()-1);
+                 from.setHours(0,0,0,0);
+                 to.setHours(24,0,0,0);*/
                 break;
             case "yesterday":
-                from.setDate(from.getDate()-1);
-                to.setDate(to.getDate()-1);
+                from.setDate(from.getDate() - 1);
+                to.setDate(to.getDate() - 1);
                 break;
             default:
 
         }
 
-        from.setHours(0,0,0,0);
-        to.setHours(23,59,59,999);
-       query['created_at'] = {"$gte":from , "$lte":to };// {"created_on": {"$gte": new Date(2012, 7, 14), "$lt": new Date(2012, 7, 15)}}
+        from.setHours(0, 0, 0, 0);
+        to.setHours(23, 59, 59, 999);
+        query['created_at'] = {"$gte": from, "$lte": to};// {"created_on": {"$gte": new Date(2012, 7, 14), "$lt": new Date(2012, 7, 15)}}
     }
     if (iss) {
         CallLogs.find(query).skip(skip)
