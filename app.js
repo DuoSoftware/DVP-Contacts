@@ -304,6 +304,27 @@ RestServer.get('/DVP/API/' + version + '/ContactManager/CallLog/:Size/:Page', au
     return next();
 });
 
+RestServer.get('/DVP/API/' + version + '/ContactManager/Resource/:ResourceName/CallLog/:Size/:Page', authorization({
+    resource: "contact",
+    action: "write"
+}), function (req, res, next) {
+    try {
+        logger.info('GetCallLogs  - Request received -  Data - %s ', JSON.stringify(req.body));
+
+
+        callLogsHandler.GetCallLogs(req,res);
+
+    }
+    catch (ex) {
+
+        logger.error('GetCallLogs - Exception occurred -  Data - %s ', JSON.stringify(req.body), ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
+        logger.debug('GetCallLogs - Request response : %s ', jsonString);
+        res.end(jsonString);
+    }
+    return next();
+});
+
 RestServer.get('/DVP/API/' + version + '/ContactManager/CallLog/Count', authorization({
     resource: "contact",
     action: "read"
