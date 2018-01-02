@@ -26,6 +26,11 @@ exports.saveContact = function (tenant, company, req, res) {
         name: req.body.name
     });
 
+    if(req.body.businessUnit)
+    {
+        contactObject.businessUnit=req.body.businessUnit;
+    }
+
     contactObject.save(function (errSave, resSave) {
         if (errSave) {
             jsonString = messageFormatter.FormatMessage(errSave, "Contact saving failed", false, undefined);
