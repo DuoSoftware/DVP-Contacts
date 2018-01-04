@@ -105,7 +105,7 @@ exports.getContacts = function (tenant, company, req, res) {
 
         }
         res.end(jsonString);
-    }).select("contact type name category");
+    }).select("contact type name category businessUnit");
 };
 
 exports.deleteContact = function (tenant, company, req, res) {
