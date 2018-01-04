@@ -9,7 +9,7 @@
     "cors": "^2.7.1",
     "dvp-common": "1.1.0",
     "dvp-dbmodels": "2.1.0",
-    "dvp-mongomodels": "4.9.7",
+    "dvp-mongomodels": "4.9.9",
     "moment": "^2.11.2",
     "mongodb": "^2.1.7",
     "mongojs": "2.3.0",
