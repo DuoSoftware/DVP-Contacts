@@ -7,7 +7,7 @@
 
 #EXPOSE 8893
 
-FROM node:argon
+FROM node:9.9.0
 ARG VERSION_TAG
 RUN git clone -b $VERSION_TAG https://github.com/DuoSoftware/DVP-Contacts.git /usr/local/src/contacts
 RUN cd /usr/local/src/contacts;
