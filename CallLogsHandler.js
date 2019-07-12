@@ -33,8 +33,26 @@ exports.SaveCallLogs = function (req, res) {
          res.end(jsonString);
          });*/
 
+        var data ={
+            "resourceName": iss,
+            "resourceId": iss,
+            "data":log.data,
+            "tenant":tenant,
+            "company":company,
+            "created_at": Date.now(),
+            "updated_at": Date.now()
+        };
+        CallLogs.update({'data.callLogSessionId': log.data.callLogSessionId}, data, {upsert: true}, function (err, report) {
+            if (err) {
+                jsonString = messageFormatter.FormatMessage(err, "saveCallLogs save failed", false, null);
+            } else {
+                jsonString = messageFormatter.FormatMessage(null, "saveCallLogs saved successfully", true, report);
+            }
+            res.end(jsonString);
+        });
 
-        CallLogs.update({
+
+        /*CallLogs.update({
             resourceName: iss,
             resourceId: iss,
             company: company,
@@ -60,7 +78,7 @@ exports.SaveCallLogs = function (req, res) {
                 jsonString = messageFormatter.FormatMessage(null, "saveCallLogs saved successfully", true, report);
             }
             res.end(jsonString);
-        });
+        });*/
 
     } else {
         jsonString = messageFormatter.FormatMessage(null, "Require fields not found", false, null);

@@ -10,6 +10,7 @@ var config = require('config');
 var port = config.Host.port || 3000;
 var version = config.Host.version;
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
+var mongocon = require('dvp-mongomodels/index');
 var contactHandler = require('./ContactsHandler');
 var callLogsHandler = require('./CallLogsHandler');
 
@@ -46,6 +47,7 @@ RestServer.use(jwt({secret: secret.Secret}));
 
 //-------------------------  Restify Server ------------------------- \\
 
+/*
 
 var mongoip = config.Mongo.ip;
 var mongoport = config.Mongo.port;
@@ -98,7 +100,7 @@ mongoose.connection.once('open', function() {
 
 
 mongoose.connect(connectionstring);
-/*
+/!*
  baseDb.authenticate(config.Mongo.user, config.Mongo.password, function(err, success){
  if(success){
  callback(null, db);
@@ -108,7 +110,7 @@ mongoose.connect(connectionstring);
  }
  });
 
- */
+ *!/
 
 var resetConnection = function () {
     try {
@@ -124,6 +126,7 @@ var resetConnection = function () {
     }
 };
 
+*/
 
 //-------------------------  ContactService ------------------------- \\
 
