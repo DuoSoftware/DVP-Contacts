@@ -17,7 +17,7 @@
 # CMD [ "node", "/usr/local/src/contacts/app.js" ]
 
 FROM node:10-alpine
-WORKDIR /usr/local/src/conference
+WORKDIR /usr/local/src/contacts
 COPY package*.json ./
 RUN npm install
 COPY . .
