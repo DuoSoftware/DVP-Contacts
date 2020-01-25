@@ -7,11 +7,19 @@
 
 #EXPOSE 8893
 
-FROM node:9.9.0
-ARG VERSION_TAG
-RUN git clone -b $VERSION_TAG https://github.com/DuoSoftware/DVP-Contacts.git /usr/local/src/contacts
-RUN cd /usr/local/src/contacts;
-WORKDIR /usr/local/src/contacts
+# FROM node:9.9.0
+# ARG VERSION_TAG
+# RUN git clone -b $VERSION_TAG https://github.com/DuoSoftware/DVP-Contacts.git /usr/local/src/contacts
+# RUN cd /usr/local/src/contacts;
+# WORKDIR /usr/local/src/contacts
+# RUN npm install
+# EXPOSE 8893
+# CMD [ "node", "/usr/local/src/contacts/app.js" ]
+
+FROM node:10-alpine
+WORKDIR /usr/local/src/conference
+COPY package*.json ./
 RUN npm install
+COPY . .
 EXPOSE 8893
-CMD [ "node", "/usr/local/src/contacts/app.js" ]
+CMD [ "node", "app.js" ]
