@@ -3,13 +3,13 @@
  */
 
 var restify = require('restify');
-var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var messageFormatter = require('dvp-common-lite/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 
 var config = require('config');
 
 var port = config.Host.port || 3000;
 var version = config.Host.version;
-var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
+var logger = require('dvp-common-lite/LogHandler/CommonLogHandler.js').logger;
 var mongocon = require('dvp-mongomodels/index');
 var contactHandler = require('./ContactsHandler');
 var callLogsHandler = require('./CallLogsHandler');
@@ -39,8 +39,8 @@ RestServer.listen(port, function () {
 
 // ---------------- Security -------------------------- \\
 var jwt = require('restify-jwt');
-var secret = require('dvp-common/Authentication/Secret.js');
-var authorization = require('dvp-common/Authentication/Authorization.js');
+var secret = require('dvp-common-lite/Authentication/Secret.js');
+var authorization = require('dvp-common-lite/Authentication/Authorization.js');
 RestServer.use(jwt({secret: secret.Secret}));
 // ---------------- Security -------------------------- \\
 
