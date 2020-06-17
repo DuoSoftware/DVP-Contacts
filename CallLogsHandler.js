@@ -4,7 +4,7 @@
 
 
 var CallLogs = require('dvp-mongomodels/model/CallLogs');
-var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var messageFormatter = require('dvp-common-lite/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 
 exports.SaveCallLogs = function (req, res) {
     var jsonString;
